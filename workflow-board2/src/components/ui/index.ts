@@ -1,6 +1,0 @@
-export { Button } from './Button'
-export { TextInput } from './TextInput'
-export { TextArea } from './TextArea'
-export { Select } from './Select'
-export { Tag } from './Tag'
-export { Card } from './Card'
