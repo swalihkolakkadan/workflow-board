@@ -4,7 +4,7 @@ import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
 const toastVariants = cva(
-  "pointer-events-auto flex w-full items-center gap-3 rounded-lg border px-4 py-3 shadow-lg transition-all data-[state=open]:animate-in data-[state=open]:slide-in-from-bottom-full data-[state=closed]:animate-out data-[state=closed]:fade-out-80 data-[state=closed]:slide-out-to-right-full",
+  "pointer-events-auto flex w-full items-center gap-3 rounded-2xl border px-4 py-3 shadow-lg backdrop-blur-xl transition-all data-[state=open]:animate-in data-[state=open]:slide-in-from-bottom-full data-[state=closed]:animate-out data-[state=closed]:fade-out-80 data-[state=closed]:slide-out-to-right-full",
   {
     variants: {
       variant: {

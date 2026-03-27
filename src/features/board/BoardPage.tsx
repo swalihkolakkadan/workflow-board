@@ -162,8 +162,8 @@ export function BoardPage() {
   );
 
   return (
-    <div className="min-h-screen bg-bg">
-      <header className="border-b border-border bg-surface">
+    <div className="min-h-screen">
+      <header className="sticky top-0 z-10 border-b border-border bg-surface-glass backdrop-blur-xl shadow-sm shadow-black/4">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
           <h1 className="text-xl font-bold text-text-primary">Workflow Board</h1>
           <Button size="sm" onClick={openCreate}>

@@ -27,7 +27,7 @@ export function BoardColumn({ status, tasks, onEditTask }: BoardColumnProps) {
   return (
     <section
       className={cn(
-        "flex flex-col rounded-lg bg-bg border border-border min-h-[200px] transition-colors",
+        "flex flex-col rounded-2xl bg-surface-glass border border-border min-h-[200px] transition-colors",
         isOver && "border-primary-300 bg-primary-50/50",
       )}
       aria-label={`${label} column`}

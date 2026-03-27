@@ -3,15 +3,15 @@ import type { HTMLAttributes } from "react";
 import { cn } from "@/lib/utils";
 
 const tagVariants = cva(
-  "inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium transition-colors",
+  "inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium ring-1 ring-inset transition-colors",
   {
     variants: {
       variant: {
-        default: "bg-surface-raised text-text-primary",
-        blue: "bg-primary-50 text-primary-700",
-        red: "bg-danger-50 text-danger-700",
-        green: "bg-success-50 text-success-600",
-        yellow: "bg-warning-50 text-warning-600",
+        default: "bg-white/30 text-text-primary ring-black/8",
+        blue: "bg-primary-500/15 text-primary-700 ring-primary-500/25",
+        red: "bg-danger-500/15 text-danger-600 ring-danger-500/25",
+        green: "bg-success-500/15 text-success-600 ring-success-500/25",
+        yellow: "bg-warning-500/15 text-warning-600 ring-warning-500/25",
       },
     },
     defaultVariants: {

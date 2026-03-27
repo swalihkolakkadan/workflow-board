@@ -23,7 +23,7 @@ const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
           ref={ref}
           id={id}
           className={cn(
-            "h-9 rounded-md border border-border bg-surface px-3 text-sm text-text-primary placeholder:text-text-muted transition-colors",
+            "h-9 rounded-xl border border-border bg-surface px-3 text-sm text-text-primary placeholder:text-text-muted transition-all",
             "focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500",
             "disabled:cursor-not-allowed disabled:opacity-50",
             error &&

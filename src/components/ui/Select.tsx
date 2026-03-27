@@ -57,7 +57,7 @@ const Select = forwardRef<HTMLButtonElement, SelectProps>(
             ref={ref}
             id={id}
             className={cn(
-              "flex h-9 w-full items-center justify-between rounded-md border border-border bg-surface px-3 text-sm text-text-primary transition-colors",
+              "flex h-9 w-full items-center justify-between rounded-xl border border-border bg-surface px-3 text-sm text-text-primary transition-all",
               "focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500",
               "disabled:cursor-not-allowed disabled:opacity-50",
               "data-placeholder:text-text-muted",
@@ -76,7 +76,7 @@ const Select = forwardRef<HTMLButtonElement, SelectProps>(
 
           <SelectPrimitive.Portal>
             <SelectPrimitive.Content
-              className="z-50 overflow-hidden rounded-md border border-border bg-surface shadow-lg animate-in fade-in-0 zoom-in-95"
+              className="z-50 overflow-hidden rounded-xl border border-border bg-surface shadow-lg animate-in fade-in-0 zoom-in-95"
               position="popper"
               sideOffset={4}
             >
@@ -86,7 +86,7 @@ const Select = forwardRef<HTMLButtonElement, SelectProps>(
                     key={option.value}
                     value={option.value}
                     className={cn(
-                      "relative flex cursor-pointer select-none items-center rounded px-3 py-1.5 text-sm text-text-primary outline-none",
+                      "relative flex cursor-pointer select-none items-center rounded-lg px-3 py-1.5 text-sm text-text-primary outline-none",
                       "data-highlighted:bg-primary-50 data-highlighted:text-primary-700",
                       "data-disabled:pointer-events-none data-disabled:opacity-50",
                     )}
