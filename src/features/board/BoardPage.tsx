@@ -28,6 +28,7 @@ export function BoardPage() {
   const [editingTask, setEditingTask] = useState<Task | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [taskToDelete, setTaskToDelete] = useState<Task | null>(null);
+  const [discardOpen, setDiscardOpen] = useState(false);
   const isDirtyRef = useRef(false);
   const [isDirtyState, setIsDirtyState] = useState(false);
 
@@ -145,16 +146,22 @@ export function BoardPage() {
 
   const handleModalClose = useCallback((open: boolean) => {
     if (!open && isDirtyRef.current) {
-      const confirmed = window.confirm(
-        "You have unsaved changes. Discard them?",
-      );
-      if (!confirmed) return;
+      setDiscardOpen(true);
+      return;
     }
     setModalOpen(open);
     if (!open) {
       setEditingTask(null);
       isDirtyRef.current = false;
     }
+  }, []);
+
+  const handleDiscardConfirm = useCallback(() => {
+    setDiscardOpen(false);
+    setModalOpen(false);
+    setEditingTask(null);
+    isDirtyRef.current = false;
+    setIsDirtyState(false);
   }, []);
 
   const handleSubmit = useCallback(
@@ -251,7 +258,24 @@ export function BoardPage() {
         </DndContext>
       </main>
 
-      <Modal open={!!taskToDelete} onOpenChange={(open) => { if (!open) setTaskToDelete(null); }}>
+      <Modal open={discardOpen} onOpenChange={(open) => { if (!open) setDiscardOpen(false); }} className="max-w-sm">
+        <Modal.Header>
+          <Modal.Title>Discard changes?</Modal.Title>
+          <Modal.Description>
+            You have unsaved changes. They will be lost if you close this form.
+          </Modal.Description>
+        </Modal.Header>
+        <Modal.Footer>
+          <Button variant="ghost" onClick={() => setDiscardOpen(false)}>
+            Keep editing
+          </Button>
+          <Button variant="destructive" onClick={handleDiscardConfirm}>
+            Discard
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
+      <Modal open={!!taskToDelete} onOpenChange={(open) => { if (!open) setTaskToDelete(null); }} className="max-w-sm">
         <Modal.Header>
           <Modal.Title>Delete Task?</Modal.Title>
           <Modal.Description>
