@@ -162,10 +162,10 @@ export function BoardPage() {
   );
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="border-b border-gray-200 bg-white">
+    <div className="min-h-screen bg-bg">
+      <header className="border-b border-border bg-surface">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
-          <h1 className="text-xl font-bold text-gray-900">Workflow Board</h1>
+          <h1 className="text-xl font-bold text-text-primary">Workflow Board</h1>
           <Button size="sm" onClick={openCreate}>
             + New Task
           </Button>
@@ -182,8 +182,8 @@ export function BoardPage() {
 
         {tasks.length === 0 && (
           <div className="flex flex-col items-center justify-center py-16 text-center">
-            <h3 className="text-lg font-medium text-gray-900">No tasks yet</h3>
-            <p className="mt-1 text-sm text-gray-500">
+            <h3 className="text-lg font-medium text-text-primary">No tasks yet</h3>
+            <p className="mt-1 text-sm text-text-secondary">
               Create your first task to get started.
             </p>
             <Button
@@ -199,10 +199,10 @@ export function BoardPage() {
 
         {filteredTasks.length === 0 && tasks.length > 0 && hasActiveFilters && (
           <div className="flex flex-col items-center justify-center py-16 text-center">
-            <h3 className="text-lg font-medium text-gray-900">
+            <h3 className="text-lg font-medium text-text-primary">
               No matching tasks
             </h3>
-            <p className="mt-1 text-sm text-gray-500">
+            <p className="mt-1 text-sm text-text-secondary">
               Try adjusting your filters or search query.
             </p>
             <Button

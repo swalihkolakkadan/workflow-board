@@ -54,7 +54,7 @@ export function TaskCard({ task, onEdit }: TaskCardProps) {
       >
         <Card.Body className="space-y-2" {...listeners}>
           <div className="flex items-start justify-between gap-2">
-            <h3 className="text-sm font-medium text-gray-900 line-clamp-2">
+            <h3 className="text-sm font-medium text-text-primary line-clamp-2">
               {task.title}
             </h3>
             <Tag variant={PRIORITY_VARIANT[task.priority]} className="shrink-0">
@@ -63,7 +63,7 @@ export function TaskCard({ task, onEdit }: TaskCardProps) {
           </div>
 
           {task.description && (
-            <p className="text-xs text-gray-500 line-clamp-2">
+            <p className="text-xs text-text-secondary line-clamp-2">
               {task.description}
             </p>
           )}
@@ -80,11 +80,11 @@ export function TaskCard({ task, onEdit }: TaskCardProps) {
 
           <div className="flex items-center justify-between pt-1">
             {task.assignee && (
-              <span className="text-xs text-gray-500 truncate max-w-[120px]">
+              <span className="text-xs text-text-secondary truncate max-w-[120px]">
                 {task.assignee}
               </span>
             )}
-            <span className="text-[11px] text-gray-400 ml-auto">
+            <span className="text-[11px] text-text-muted ml-auto">
               {formatDistanceToNow(new Date(task.updatedAt), {
                 addSuffix: true,
               })}

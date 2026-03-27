@@ -27,8 +27,8 @@ export function EmptyState({ type, onAction }: EmptyStateProps) {
 
   return (
     <div className="flex flex-col items-center justify-center py-16 text-center">
-      <h3 className="text-lg font-medium text-gray-900">{config.title}</h3>
-      <p className="mt-1 text-sm text-gray-500 max-w-sm">
+      <h3 className="text-lg font-medium text-text-primary">{config.title}</h3>
+      <p className="mt-1 text-sm text-text-secondary max-w-sm">
         {config.description}
       </p>
       {config.action && onAction && (

@@ -7,7 +7,7 @@ const tagVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-gray-100 text-gray-700",
+        default: "bg-surface-raised text-text-primary",
         blue: "bg-primary-50 text-primary-700",
         red: "bg-danger-50 text-danger-700",
         green: "bg-success-50 text-success-600",

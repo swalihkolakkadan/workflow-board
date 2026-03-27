@@ -43,7 +43,7 @@ const Select = forwardRef<HTMLButtonElement, SelectProps>(
     return (
       <div className="flex flex-col gap-1.5">
         {label && (
-          <label htmlFor={id} className="text-sm font-medium text-gray-700">
+          <label htmlFor={id} className="text-sm font-medium text-text-primary">
             {label}
           </label>
         )}
@@ -57,10 +57,10 @@ const Select = forwardRef<HTMLButtonElement, SelectProps>(
             ref={ref}
             id={id}
             className={cn(
-              "flex h-9 w-full items-center justify-between rounded-md border border-gray-300 bg-white px-3 text-sm text-gray-900 transition-colors",
+              "flex h-9 w-full items-center justify-between rounded-md border border-border bg-surface px-3 text-sm text-text-primary transition-colors",
               "focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500",
               "disabled:cursor-not-allowed disabled:opacity-50",
-              "data-[placeholder]:text-gray-400",
+              "data-placeholder:text-text-muted",
               error &&
                 "border-danger-500 focus:ring-danger-500 focus:border-danger-500",
               className,
@@ -76,7 +76,7 @@ const Select = forwardRef<HTMLButtonElement, SelectProps>(
 
           <SelectPrimitive.Portal>
             <SelectPrimitive.Content
-              className="z-50 overflow-hidden rounded-md border border-gray-200 bg-white shadow-lg animate-in fade-in-0 zoom-in-95"
+              className="z-50 overflow-hidden rounded-md border border-border bg-surface shadow-lg animate-in fade-in-0 zoom-in-95"
               position="popper"
               sideOffset={4}
             >
@@ -86,9 +86,9 @@ const Select = forwardRef<HTMLButtonElement, SelectProps>(
                     key={option.value}
                     value={option.value}
                     className={cn(
-                      "relative flex cursor-pointer select-none items-center rounded px-3 py-1.5 text-sm text-gray-900 outline-none",
-                      "data-[highlighted]:bg-primary-50 data-[highlighted]:text-primary-700",
-                      "data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+                      "relative flex cursor-pointer select-none items-center rounded px-3 py-1.5 text-sm text-text-primary outline-none",
+                      "data-highlighted:bg-primary-50 data-highlighted:text-primary-700",
+                      "data-disabled:pointer-events-none data-disabled:opacity-50",
                     )}
                   >
                     <SelectPrimitive.ItemText>
@@ -119,7 +119,7 @@ function ChevronDownIcon() {
       height="16"
       viewBox="0 0 16 16"
       fill="none"
-      className="text-gray-500"
+      className="text-text-muted"
       aria-hidden="true"
     >
       <path

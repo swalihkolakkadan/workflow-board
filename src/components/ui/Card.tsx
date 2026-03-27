@@ -5,7 +5,7 @@ function Card({ className, ...props }: HTMLAttributes<HTMLDivElement>) {
   return (
     <div
       className={cn(
-        "rounded-lg border border-gray-200 bg-white shadow-sm",
+        "rounded-lg border border-border bg-surface shadow-sm",
         className,
       )}
       {...props}
@@ -16,7 +16,7 @@ function Card({ className, ...props }: HTMLAttributes<HTMLDivElement>) {
 function CardHeader({ className, ...props }: HTMLAttributes<HTMLDivElement>) {
   return (
     <div
-      className={cn("px-4 py-3 border-b border-gray-100", className)}
+      className={cn("px-4 py-3 border-b border-border-subtle", className)}
       {...props}
     />
   );
@@ -29,7 +29,7 @@ function CardBody({ className, ...props }: HTMLAttributes<HTMLDivElement>) {
 function CardFooter({ className, ...props }: HTMLAttributes<HTMLDivElement>) {
   return (
     <div
-      className={cn("px-4 py-3 border-t border-gray-100", className)}
+      className={cn("px-4 py-3 border-t border-border-subtle", className)}
       {...props}
     />
   );

@@ -16,7 +16,7 @@ function Modal({ open, onOpenChange, children }: ModalProps) {
         <Dialog.Content
           className={cn(
             "fixed left-1/2 top-1/2 z-50 w-full max-w-lg -translate-x-1/2 -translate-y-1/2",
-            "rounded-lg border border-gray-200 bg-white shadow-xl",
+            "rounded-lg border border-border bg-surface shadow-xl",
             "data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95",
             "data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95",
             "focus:outline-none",
@@ -43,7 +43,7 @@ function ModalTitle({
 }: React.HTMLAttributes<HTMLHeadingElement>) {
   return (
     <Dialog.Title
-      className={cn("text-lg font-semibold text-gray-900", className)}
+      className={cn("text-lg font-semibold text-text-primary", className)}
       {...props}
     >
       {children}
@@ -58,7 +58,7 @@ function ModalDescription({
 }: React.HTMLAttributes<HTMLParagraphElement>) {
   return (
     <Dialog.Description
-      className={cn("text-sm text-gray-500 mt-1", className)}
+      className={cn("text-sm text-text-secondary mt-1", className)}
       {...props}
     >
       {children}
