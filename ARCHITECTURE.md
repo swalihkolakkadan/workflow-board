@@ -78,56 +78,16 @@ Filter/sort state lives in the URL query string (`?search=bug&priority=high&sort
 
 Each column is a droppable target, each card is sortable. On drag end, the task's status is updated via `moveTask()`.
 
-## Performance
-
-### Identified Optimization: Zustand Selector for Column Rendering
-
-**Problem**: Without selectors, every `BoardColumn` would re-render on any task change (even in a different column), because `useTaskStore()` subscribes to the entire store.
-
-**Fix**: The filtering and grouping in `BoardPage` uses `useMemo` to derive `tasksByStatus` from the filtered task list. Each column receives only its own tasks as props, and `TaskCard` is wrapped in `React.memo`, so a change in one column's task doesn't trigger re-renders in other columns.
-
-**Measurement**: Verified via React DevTools Profiler — editing a task in "In Progress" does not cause re-renders in "Backlog" or "Done" columns.
-
-### Other Performance Considerations
-
-- Text search in FilterBar is debounced at 300ms to avoid filtering on every keystroke
-- `useCallback` on event handlers passed to child components to maintain referential equality
-- `useMemo` on the filtered + sorted task derivation
-
-## Refactor Example
-
-**TaskForm `onDirtyChange` during render → useEffect**
-
-Initially, `onDirtyChange` was called directly in the render body of `TaskForm`:
-
-```tsx
-if (onDirtyChange) {
-  onDirtyChange(isDirty);
-}
-```
-
-This caused a React warning: "Cannot update a component while rendering a different component." The fix was moving it into a `useEffect`:
-
-```tsx
-useEffect(() => {
-  onDirtyChange?.(isDirty);
-}, [isDirty, onDirtyChange]);
-```
-
-This is a common pitfall when passing state-lifting callbacks to child components — effects are the correct place for side-effects that notify parents.
-
 ## Known Limitations & Trade-offs
 
 - **Single status filter**: The status filter currently selects one status at a time (or all). True multi-select would require a custom multi-select component or a checkbox-based dropdown.
 - **No task deletion UI**: `deleteTask` exists in the store but there's no UI button for it yet. Would add a destructive action in the edit modal.
 - **No optimistic drag preview**: The drag overlay shows the card but doesn't show the "hole" where it would land. Could improve with @dnd-kit's sortable animations.
-- **No dark mode**: Theme tokens are set up for it, but only light mode is implemented.
 - **No persistence of column order**: Tasks within a column are sorted by the active sort, not by manual drag order within a column.
 
 ## What I'd Do Next
 
 1. Add task deletion with a confirmation dialog (Radix AlertDialog)
 2. Multi-select status filter using a popover with checkboxes
-3. Dark mode toggle using Tailwind's `dark:` variant and a theme store
-4. Keyboard shortcut for creating a task (Cmd+K or similar)
-5. Virtualized task lists for columns with many cards (react-window)
+3. Keyboard shortcut for creating a task (Cmd+K or similar)
+4. Virtualized task lists for columns with many cards (react-window)

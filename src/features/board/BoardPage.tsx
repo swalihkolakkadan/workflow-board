@@ -20,13 +20,14 @@ import { useFilterParams } from "./hooks/useFilterParams";
 import { useFormGuard } from "./hooks/useFormGuard";
 
 export function BoardPage() {
-  const { tasks, init, addTask, updateTask, moveTask } = useTaskStore();
+  const { tasks, init, addTask, updateTask, deleteTask, moveTask } = useTaskStore();
   const addToast = useToastStore((s) => s.addToast);
   const { filters, setFilter, clearFilters, hasActiveFilters } =
     useFilterParams();
   const [activeTask, setActiveTask] = useState<Task | null>(null);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
+  const [taskToDelete, setTaskToDelete] = useState<Task | null>(null);
   const isDirtyRef = useRef(false);
   const [isDirtyState, setIsDirtyState] = useState(false);
 
@@ -131,6 +132,17 @@ export function BoardPage() {
     setModalOpen(true);
   }, []);
 
+  const handleDelete = useCallback((task: Task) => {
+    setTaskToDelete(task);
+  }, []);
+
+  const handleConfirmDelete = useCallback(() => {
+    if (!taskToDelete) return;
+    deleteTask(taskToDelete.id);
+    addToast({ title: "Task deleted", variant: "default" });
+    setTaskToDelete(null);
+  }, [taskToDelete, deleteTask, addToast]);
+
   const handleModalClose = useCallback((open: boolean) => {
     if (!open && isDirtyRef.current) {
       const confirmed = window.confirm(
@@ -162,9 +174,9 @@ export function BoardPage() {
   );
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen flex flex-col">
       <header className="sticky top-0 z-10 border-b border-border bg-surface-glass backdrop-blur-xl shadow-sm shadow-black/4">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
+        <div className="max-w-7xl xl:max-w-none mx-auto px-4 sm:px-6 xl:px-10 py-4 flex items-center justify-between">
           <h1 className="text-xl font-bold text-text-primary">Workflow Board</h1>
           <Button size="sm" onClick={openCreate}>
             + New Task
@@ -172,7 +184,7 @@ export function BoardPage() {
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 py-6">
+      <main className="max-w-7xl xl:max-w-none mx-auto px-4 sm:px-6 xl:px-10 py-6 md:pb-4 w-full flex-1 flex flex-col min-h-0">
         <FilterBar
           filters={filters}
           onFilterChange={setFilter}
@@ -221,22 +233,40 @@ export function BoardPage() {
           onDragStart={handleDragStart}
           onDragEnd={handleDragEnd}
         >
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:flex-1 md:min-h-0">
             {STATUSES.map(({ value }) => (
               <BoardColumn
                 key={value}
                 status={value}
                 tasks={tasksByStatus[value]}
                 onEditTask={openEdit}
+                onDeleteTask={handleDelete}
               />
             ))}
           </div>
 
           <DragOverlay>
-            {activeTask && <TaskCard task={activeTask} onEdit={() => {}} />}
+            {activeTask && <TaskCard task={activeTask} onEdit={() => {}} onDelete={() => {}} />}
           </DragOverlay>
         </DndContext>
       </main>
+
+      <Modal open={!!taskToDelete} onOpenChange={(open) => { if (!open) setTaskToDelete(null); }}>
+        <Modal.Header>
+          <Modal.Title>Delete Task?</Modal.Title>
+          <Modal.Description>
+            "{taskToDelete?.title}" will be permanently deleted.
+          </Modal.Description>
+        </Modal.Header>
+        <Modal.Footer>
+          <Modal.Close asChild>
+            <Button variant="ghost">Cancel</Button>
+          </Modal.Close>
+          <Button variant="destructive" onClick={handleConfirmDelete}>
+            Delete
+          </Button>
+        </Modal.Footer>
+      </Modal>
 
       <Modal open={modalOpen} onOpenChange={handleModalClose}>
         <Modal.Header>

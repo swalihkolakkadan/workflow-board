@@ -12,6 +12,7 @@ type BoardColumnProps = {
   status: Status;
   tasks: Task[];
   onEditTask: (task: Task) => void;
+  onDeleteTask: (task: Task) => void;
 };
 
 const STATUS_COLORS: Record<Status, string> = {
@@ -20,14 +21,14 @@ const STATUS_COLORS: Record<Status, string> = {
   done: "bg-success-500",
 };
 
-export function BoardColumn({ status, tasks, onEditTask }: BoardColumnProps) {
+export function BoardColumn({ status, tasks, onEditTask, onDeleteTask }: BoardColumnProps) {
   const { setNodeRef, isOver } = useDroppable({ id: status });
   const label = STATUSES.find((s) => s.value === status)?.label ?? status;
 
   return (
     <section
       className={cn(
-        "flex flex-col rounded-2xl bg-surface-glass border border-border min-h-[200px] transition-colors",
+        "flex flex-col rounded-2xl bg-surface-glass border border-border min-h-[200px] md:h-full transition-colors",
         isOver && "border-primary-300 bg-primary-50/50",
       )}
       aria-label={`${label} column`}
@@ -48,7 +49,7 @@ export function BoardColumn({ status, tasks, onEditTask }: BoardColumnProps) {
           strategy={verticalListSortingStrategy}
         >
           {tasks.map((task) => (
-            <TaskCard key={task.id} task={task} onEdit={onEditTask} />
+            <TaskCard key={task.id} task={task} onEdit={onEditTask} onDelete={onDeleteTask} />
           ))}
         </SortableContext>
 

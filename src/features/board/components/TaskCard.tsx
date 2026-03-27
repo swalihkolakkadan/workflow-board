@@ -1,7 +1,8 @@
+import { PencilLineIcon, TrashIcon } from "@phosphor-icons/react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { formatDistanceToNow } from "date-fns";
-import { Card, Tag } from "@/components/ui";
+import { Button, Card, Tag } from "@/components/ui";
 import type { Task } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
@@ -14,9 +15,10 @@ const PRIORITY_VARIANT = {
 type TaskCardProps = {
   task: Task;
   onEdit: (task: Task) => void;
+  onDelete: (task: Task) => void;
 };
 
-export function TaskCard({ task, onEdit }: TaskCardProps) {
+export function TaskCard({ task, onEdit, onDelete }: TaskCardProps) {
   const {
     attributes,
     listeners,
@@ -38,7 +40,7 @@ export function TaskCard({ task, onEdit }: TaskCardProps) {
     <div ref={setNodeRef} style={style} {...attributes}>
       <Card
         className={cn(
-          "cursor-grab active:cursor-grabbing hover:border-gray-300 transition-all",
+          "group cursor-grab active:cursor-grabbing hover:border-gray-300 transition-all",
           isDragging && "opacity-50 shadow-lg rotate-2",
         )}
         onClick={() => onEdit(task)}
@@ -57,9 +59,37 @@ export function TaskCard({ task, onEdit }: TaskCardProps) {
             <h3 className="text-sm font-medium text-text-primary line-clamp-2">
               {task.title}
             </h3>
-            <Tag variant={PRIORITY_VARIANT[task.priority]} className="shrink-0">
-              {task.priority}
-            </Tag>
+            <div className="flex items-center gap-1.5 shrink-0">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onEdit(task);
+                }}
+                onPointerDown={(e) => e.stopPropagation()}
+                className="opacity-0 group-hover:opacity-100 transition-opacity text-text-muted hover:text-primary-600 hover:bg-primary-50"
+                aria-label={`Edit task: ${task.title}`}
+              >
+                <PencilLineIcon size={14} weight="bold" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onDelete(task);
+                }}
+                onPointerDown={(e) => e.stopPropagation()}
+                className="opacity-0 group-hover:opacity-100 transition-opacity text-text-muted hover:text-danger-600 hover:bg-danger-50"
+                aria-label={`Delete task: ${task.title}`}
+              >
+                <TrashIcon size={14} weight="bold" />
+              </Button>
+              <Tag variant={PRIORITY_VARIANT[task.priority]}>
+                {task.priority}
+              </Tag>
+            </div>
           </div>
 
           {task.description && (
