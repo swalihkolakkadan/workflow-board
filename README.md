@@ -1,75 +1,65 @@
-# React + TypeScript + Vite
+# Workflow Board
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A team workflow management app — a simplified Jira/Trello board for viewing, creating, editing, filtering, and drag-and-dropping tasks across status columns. Built with a custom component library.
 
-Currently, two official plugins are available:
+## Quick Start
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+@@ -9,36 +9,52 @@ npm install
+npm run dev
 
-## React Compiler
-
-The React Compiler is enabled on this template. See [this documentation](https://react.dev/learn/react-compiler) for more information.
-
-Note: This will impact Vite dev & build performances.
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+Open [http://localhost:5173](http://localhost:5173).
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## Scripts
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+- `npm run dev` — Start dev server
+- `npm run build` — Type-check and build for production
+- `npm run test` — Run tests in watch mode
+- `npm run test:run` — Run tests once
+- `npm run lint` — Lint with ESLint
+- `npm run preview` — Preview production build
+
+
+
+## Tech Stack
+
+- **React 19** + **TypeScript** (strict mode)
+- **Vite** for builds and dev server
+- **Tailwind CSS v4** + `class-variance-authority` for styling and component variants
+- **Zustand** for state management (justification in ARCHITECTURE.md)
+- **Radix UI** primitives for Dialog, Select, Toast (unstyled, accessible)
+- **@dnd-kit** for accessible drag-and-drop
+- **date-fns** for relative time formatting
+- **Vitest** + **React Testing Library** for tests
+
+## Project Structure
+
+```
+
+src/
+├── components/ui/ # Design system: Button, TextInput, TextArea, Select,
+│ # Tag, Card, Modal, Toast
+├── features/board/ # Board feature
+│ ├── components/ # BoardColumn, TaskCard, TaskForm, FilterBar, EmptyState
+│ ├── hooks/ # useFilterParams, useTaskForm
+│ └── BoardPage.tsx # Main page orchestrator
+├── stores/ # Zustand stores (taskStore, toastStore)
+├── hooks/ # Shared hooks (useFormGuard)
+├── lib/ # Types, constants, storage, migrations
+└── test/ # Test setup and test files
+
+```
+
+See [ARCHITECTURE.md](ARCHITECTURE.md) for detailed design decisions.
+
+## AI Assistance
+
+This project was built with AI pair-programming assistance (Cursor with Claude). All code was reviewed, understood, and adjusted by the author. Specific areas where AI assisted:
+
+- Initial project scaffolding and Tailwind/Vitest configuration
+- Component boilerplate (props types, forwardRef patterns)
+- Test file structure
+
+Changes made from AI suggestions: adjusted Radix component APIs to match actual library usage, fixed React 19 `useRef` signature change, scoped test selectors to dialog context to avoid ambiguous queries.
 ```
