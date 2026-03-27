@@ -1,4 +1,3 @@
-import { memo } from 'react'
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import { formatDistanceToNow } from 'date-fns'
@@ -17,7 +16,7 @@ type TaskCardProps = {
     onEdit: (task: Task) => void
 }
 
-export const TaskCard = memo(function TaskCard({ task, onEdit }: TaskCardProps) {
+export function TaskCard({ task, onEdit }: TaskCardProps) {
     const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
         id: task.id,
         data: { task },
@@ -82,4 +81,4 @@ export const TaskCard = memo(function TaskCard({ task, onEdit }: TaskCardProps) 
             </Card>
         </div>
     )
-})
+}
