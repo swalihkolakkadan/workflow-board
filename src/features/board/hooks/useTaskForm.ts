@@ -1,70 +1,70 @@
-import { useState, useCallback, useRef, useMemo } from 'react'
-import type { TaskFormValues } from '@/lib/types'
+import { useCallback, useMemo, useState } from "react";
+import type { TaskFormValues } from "@/lib/types";
 
-type FormErrors = Partial<Record<keyof TaskFormValues, string>>
+type FormErrors = Partial<Record<keyof TaskFormValues, string>>;
 
 const INITIAL_VALUES: TaskFormValues = {
-  title: '',
-  description: '',
-  status: 'backlog',
-  priority: 'medium',
-  assignee: '',
+  title: "",
+  description: "",
+  status: "backlog",
+  priority: "medium",
+  assignee: "",
   tags: [],
-}
+};
 
 function validate(values: TaskFormValues): FormErrors {
-  const errors: FormErrors = {}
+  const errors: FormErrors = {};
 
   if (!values.title.trim()) {
-    errors.title = 'Title is required'
+    errors.title = "Title is required";
   } else if (values.title.trim().length < 3) {
-    errors.title = 'Title must be at least 3 characters'
+    errors.title = "Title must be at least 3 characters";
   }
 
-  return errors
+  return errors;
 }
 
 export function useTaskForm(initialValues?: TaskFormValues) {
-  const defaults = initialValues ?? INITIAL_VALUES
-  const [values, setValues] = useState<TaskFormValues>(defaults)
-  const [errors, setErrors] = useState<FormErrors>({})
-  const initialRef = useRef(defaults)
+  const defaults = initialValues ?? INITIAL_VALUES;
+  const [values, setValues] = useState<TaskFormValues>(defaults);
+  const [errors, setErrors] = useState<FormErrors>({});
+  const [baseline, setBaseline] = useState<TaskFormValues>(() => defaults);
 
   const isDirty = useMemo(() => {
-    return JSON.stringify(values) !== JSON.stringify(initialRef.current)
-  }, [values])
+    return JSON.stringify(values) !== JSON.stringify(baseline);
+  }, [values, baseline]);
 
   const handleChange = useCallback(
     <K extends keyof TaskFormValues>(field: K, value: TaskFormValues[K]) => {
-      setValues((prev) => ({ ...prev, [field]: value }))
+      setValues((prev) => ({ ...prev, [field]: value }));
       setErrors((prev) => {
-        if (!prev[field]) return prev
-        const next = { ...prev }
-        delete next[field]
-        return next
-      })
+        if (!prev[field]) return prev;
+        const next = { ...prev };
+        delete next[field];
+        return next;
+      });
     },
-    []
-  )
+    [],
+  );
 
   const handleSubmit = useCallback(
     (onSubmit: (values: TaskFormValues) => void) => {
-      const errs = validate(values)
+      const errs = validate(values);
       if (Object.keys(errs).length > 0) {
-        setErrors(errs)
-        return
+        setErrors(errs);
+        return;
       }
-      onSubmit(values)
+      onSubmit(values);
     },
-    [values]
-  )
+    [values],
+  );
 
   const reset = useCallback((newDefaults?: TaskFormValues) => {
-    const d = newDefaults ?? INITIAL_VALUES
-    setValues(d)
-    setErrors({})
-    initialRef.current = d
-  }, [])
+    const d = newDefaults ?? INITIAL_VALUES;
+    setValues(d);
+    setErrors({});
+    setBaseline(d);
+  }, []);
 
-  return { values, errors, isDirty, handleChange, handleSubmit, reset }
+  return { values, errors, isDirty, handleChange, handleSubmit, reset };
 }

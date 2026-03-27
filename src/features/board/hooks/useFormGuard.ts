@@ -1,15 +1,14 @@
-
-import { useEffect } from 'react'
+import { useEffect } from "react";
 
 export function useFormGuard(isDirty: boolean) {
   useEffect(() => {
-    if (!isDirty) return
+    if (!isDirty) return;
 
     const handler = (e: BeforeUnloadEvent) => {
-      e.preventDefault()
-    }
+      e.preventDefault();
+    };
 
-    window.addEventListener('beforeunload', handler)
-    return () => window.removeEventListener('beforeunload', handler)
-  }, [isDirty])
+    window.addEventListener("beforeunload", handler);
+    return () => window.removeEventListener("beforeunload", handler);
+  }, [isDirty]);
 }
