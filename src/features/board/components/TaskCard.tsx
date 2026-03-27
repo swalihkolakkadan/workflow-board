@@ -115,6 +115,7 @@ export function TaskCard({ task, onEdit, onDelete }: TaskCardProps) {
               </span>
             )}
             <span className="text-[11px] text-text-muted ml-auto">
+              {task.createdAt === task.updatedAt ? "Created" : "Updated"}{" "}
               {formatDistanceToNow(new Date(task.updatedAt), {
                 addSuffix: true,
               })}

@@ -1,4 +1,4 @@
-import { Button, Select, TextInput } from "@/components/ui";
+import { Button, MultiSelect, Select, TextInput } from "@/components/ui";
 import { PRIORITIES, SORT_OPTIONS, STATUSES } from "@/lib/constants";
 import type { FilterState, Priority, SortField, Status } from "@/lib/types";
 
@@ -29,18 +29,12 @@ export function FilterBar({
         />
       </div>
 
-      <div className="w-40">
-        <Select
-          placeholder="Status"
-          options={[{ value: "__all__", label: "All Statuses" }, ...STATUSES]}
-          value={filters.status.length === 1 ? filters.status[0] : "__all__"}
-          onValueChange={(v) => {
-            if (v === "__all__") {
-              onFilterChange("status", [] as Status[]);
-            } else {
-              onFilterChange("status", [v as Status]);
-            }
-          }}
+      <div className="w-44">
+        <MultiSelect
+          placeholder="All Statuses"
+          options={STATUSES}
+          value={filters.status}
+          onValueChange={(v) => onFilterChange("status", v as Status[])}
         />
       </div>
 

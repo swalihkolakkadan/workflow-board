@@ -1,6 +1,7 @@
 export { Button } from "./Button";
 export { Card } from "./Card";
 export { Modal } from "./Modal";
+export { MultiSelect } from "./MultiSelect";
 export { Select } from "./Select";
 export { Tag } from "./Tag";
 export { TextArea } from "./TextArea";
