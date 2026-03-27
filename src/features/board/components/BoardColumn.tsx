@@ -1,4 +1,4 @@
-import { useDroppable } from "@dnd-kit/core";
+import { useDndContext, useDroppable } from "@dnd-kit/core";
 import {
   SortableContext,
   verticalListSortingStrategy,
@@ -22,7 +22,9 @@ const STATUS_COLORS: Record<Status, string> = {
 };
 
 export function BoardColumn({ status, tasks, onEditTask, onDeleteTask }: BoardColumnProps) {
-  const { setNodeRef, isOver } = useDroppable({ id: status });
+  const { setNodeRef, isOver: isOverColumn } = useDroppable({ id: status });
+  const { over } = useDndContext();
+  const isOver = isOverColumn || tasks.some((t) => t.id === over?.id);
   const label = STATUSES.find((s) => s.value === status)?.label ?? status;
 
   return (

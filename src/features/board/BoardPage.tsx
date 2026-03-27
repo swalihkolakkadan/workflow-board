@@ -107,9 +107,14 @@ export function BoardPage() {
       if (!over) return;
 
       const taskId = active.id as string;
-      const newStatus = over.id as Status;
+      const overId = over.id as string;
 
-      if (STATUSES.some((s) => s.value === newStatus)) {
+      // over.id is either a column status or a card UUID — resolve to a status
+      const newStatus: Status | undefined = STATUSES.some((s) => s.value === overId)
+        ? (overId as Status)
+        : tasks.find((t) => t.id === overId)?.status;
+
+      if (newStatus) {
         const task = tasks.find((t) => t.id === taskId);
         if (task && task.status !== newStatus) {
           moveTask(taskId, newStatus);
