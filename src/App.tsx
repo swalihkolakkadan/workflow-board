@@ -1,6 +1,9 @@
 import { ToastProvider } from "@/components/ui";
 import { BoardPage } from "@/features/board/BoardPage";
+import { UIReferencePage } from "@/features/ui-reference/UIReferencePage";
 import { useToastStore } from "@/stores/toastStore";
+
+const isUIRoute = window.location.pathname === "/ui";
 
 function App() {
   const toasts = useToastStore((s) => s.toasts);
@@ -8,7 +11,7 @@ function App() {
 
   return (
     <ToastProvider toasts={toasts} onClose={removeToast}>
-      <BoardPage />
+      {isUIRoute ? <UIReferencePage /> : <BoardPage />}
     </ToastProvider>
   );
 }
