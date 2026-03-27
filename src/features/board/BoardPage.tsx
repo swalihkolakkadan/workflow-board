@@ -9,23 +9,67 @@ import {
 import { Button, Modal } from '@/components/ui'
 import { useTaskStore } from '@/stores/taskStore'
 import { useToastStore } from '@/stores/toastStore'
-import { STATUSES } from '@/lib/constants'
+import { useFormGuard } from './hooks/useFormGuard'
+import { isStorageAvailable } from '@/lib/storage'
+import { STATUSES, PRIORITY_WEIGHT } from '@/lib/constants'
 import type { Task, Status, TaskFormValues } from '@/lib/types'
 import { BoardColumn } from './components/BoardColumn'
 import { TaskCard } from './components/TaskCard'
 import { TaskForm } from './components/TaskForm'
+import { FilterBar } from './components/FilterBar'
+import { useFilterParams } from './hooks/useFilterParams'
 
 export function BoardPage() {
     const { tasks, init, addTask, updateTask, moveTask } = useTaskStore()
     const addToast = useToastStore((s) => s.addToast)
+    const { filters, setFilter, clearFilters, hasActiveFilters } = useFilterParams()
     const [activeTask, setActiveTask] = useState<Task | null>(null)
     const [editingTask, setEditingTask] = useState<Task | null>(null)
     const [modalOpen, setModalOpen] = useState(false)
     const isDirtyRef = useRef(false)
+    const [isDirtyState, setIsDirtyState] = useState(false)
+
+    useFormGuard(isDirtyState)
 
     useEffect(() => {
         init()
-    }, [init])
+        if (!isStorageAvailable()) {
+            addToast({
+                title: 'Storage unavailable',
+                description: 'Your browser storage is not available. Tasks will not be saved.',
+                variant: 'error',
+                duration: 8000,
+            })
+        }
+    }, [init, addToast])
+
+    const filteredTasks = useMemo(() => {
+        let result = tasks
+
+        if (filters.search) {
+            const q = filters.search.toLowerCase()
+            result = result.filter(
+                (t) => t.title.toLowerCase().includes(q) || t.description.toLowerCase().includes(q)
+            )
+        }
+
+        if (filters.status.length > 0) {
+            result = result.filter((t) => filters.status.includes(t.status))
+        }
+
+        if (filters.priority) {
+            result = result.filter((t) => t.priority === filters.priority)
+        }
+
+        result = [...result].sort((a, b) => {
+            if (filters.sort === 'priority') {
+                return PRIORITY_WEIGHT[b.priority] - PRIORITY_WEIGHT[a.priority]
+            }
+            return new Date(b[filters.sort]).getTime() - new Date(a[filters.sort]).getTime()
+        })
+
+        return result
+    }, [tasks, filters])
 
     const tasksByStatus = useMemo(() => {
         const grouped: Record<Status, Task[]> = {
@@ -33,11 +77,11 @@ export function BoardPage() {
             'in-progress': [],
             done: [],
         }
-        for (const task of tasks) {
+        for (const task of filteredTasks) {
             grouped[task.status].push(task)
         }
         return grouped
-    }, [tasks])
+    }, [filteredTasks])
 
     const handleDragStart = useCallback(
         (event: DragStartEvent) => {
@@ -123,6 +167,33 @@ export function BoardPage() {
             </header>
 
             <main className="max-w-7xl mx-auto px-4 sm:px-6 py-6">
+                <FilterBar
+                    filters={filters}
+                    onFilterChange={setFilter}
+                    onClear={clearFilters}
+                    hasActiveFilters={hasActiveFilters}
+                />
+
+                {tasks.length === 0 && (
+                    <div className="flex flex-col items-center justify-center py-16 text-center">
+                        <h3 className="text-lg font-medium text-gray-900">No tasks yet</h3>
+                        <p className="mt-1 text-sm text-gray-500">Create your first task to get started.</p>
+                        <Button variant="primary" size="sm" className="mt-4" onClick={openCreate}>
+                            Create Task
+                        </Button>
+                    </div>
+                )}
+
+                {filteredTasks.length === 0 && tasks.length > 0 && hasActiveFilters && (
+                    <div className="flex flex-col items-center justify-center py-16 text-center">
+                        <h3 className="text-lg font-medium text-gray-900">No matching tasks</h3>
+                        <p className="mt-1 text-sm text-gray-500">Try adjusting your filters or search query.</p>
+                        <Button variant="ghost" size="sm" className="mt-4" onClick={clearFilters}>
+                            Clear filters
+                        </Button>
+                    </div>
+                )}
+
                 <DndContext
                     collisionDetection={closestCorners}
                     onDragStart={handleDragStart}
@@ -168,6 +239,7 @@ export function BoardPage() {
                         onCancel={() => handleModalClose(false)}
                         onDirtyChange={(dirty) => {
                             isDirtyRef.current = dirty
+                            setIsDirtyState(dirty)
                         }}
                     />
                 </Modal.Body>

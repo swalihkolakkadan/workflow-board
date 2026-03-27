@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react'
+import { useCallback, useState, useEffect } from 'react'
 import { Button, TextInput, TextArea, Select } from '@/components/ui'
 import { STATUSES, PRIORITIES } from '@/lib/constants'
 import type { TaskFormValues } from '@/lib/types'
@@ -15,9 +15,9 @@ export function TaskForm({ initialValues, onSubmit, onCancel, onDirtyChange }: T
     const { values, errors, isDirty, handleChange, handleSubmit } = useTaskForm(initialValues)
     const [tagInput, setTagInput] = useState('')
 
-    if (onDirtyChange) {
-        onDirtyChange(isDirty)
-    }
+    useEffect(() => {
+        onDirtyChange?.(isDirty)
+    }, [isDirty, onDirtyChange])
 
     const addTag = useCallback(() => {
         const tag = tagInput.trim()
