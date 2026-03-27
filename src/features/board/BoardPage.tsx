@@ -1,16 +1,27 @@
-import { useEffect, useState, useMemo, useCallback } from 'react'
-import { DndContext, DragOverlay, closestCorners, type DragEndEvent, type DragStartEvent } from '@dnd-kit/core'
-import { Button } from '@/components/ui'
+import { useEffect, useState, useMemo, useCallback, useRef } from 'react'
+import {
+    DndContext,
+    DragOverlay,
+    closestCorners,
+    type DragEndEvent,
+    type DragStartEvent,
+} from '@dnd-kit/core'
+import { Button, Modal } from '@/components/ui'
 import { useTaskStore } from '@/stores/taskStore'
+import { useToastStore } from '@/stores/toastStore'
 import { STATUSES } from '@/lib/constants'
-import type { Task, Status } from '@/lib/types'
+import type { Task, Status, TaskFormValues } from '@/lib/types'
 import { BoardColumn } from './components/BoardColumn'
 import { TaskCard } from './components/TaskCard'
+import { TaskForm } from './components/TaskForm'
 
 export function BoardPage() {
-    const { tasks, init, moveTask } = useTaskStore()
+    const { tasks, init, addTask, updateTask, moveTask } = useTaskStore()
+    const addToast = useToastStore((s) => s.addToast)
     const [activeTask, setActiveTask] = useState<Task | null>(null)
-    const [, setEditingTask] = useState<Task | null>(null)
+    const [editingTask, setEditingTask] = useState<Task | null>(null)
+    const [modalOpen, setModalOpen] = useState(false)
+    const isDirtyRef = useRef(false)
 
     useEffect(() => {
         init()
@@ -49,22 +60,65 @@ export function BoardPage() {
                 const task = tasks.find((t) => t.id === taskId)
                 if (task && task.status !== newStatus) {
                     moveTask(taskId, newStatus)
+                    addToast({
+                        title: `Moved to ${STATUSES.find((s) => s.value === newStatus)?.label}`,
+                        variant: 'success',
+                    })
                 }
             }
         },
-        [tasks, moveTask]
+        [tasks, moveTask, addToast]
     )
 
-    const handleEditTask = useCallback((task: Task) => {
-        setEditingTask(task)
+    const openCreate = useCallback(() => {
+        setEditingTask(null)
+        setModalOpen(true)
     }, [])
+
+    const openEdit = useCallback((task: Task) => {
+        setEditingTask(task)
+        setModalOpen(true)
+    }, [])
+
+    const handleModalClose = useCallback(
+        (open: boolean) => {
+            if (!open && isDirtyRef.current) {
+                const confirmed = window.confirm('You have unsaved changes. Discard them?')
+                if (!confirmed) return
+            }
+            setModalOpen(open)
+            if (!open) {
+                setEditingTask(null)
+                isDirtyRef.current = false
+            }
+        },
+        []
+    )
+
+    const handleSubmit = useCallback(
+        (values: TaskFormValues) => {
+            if (editingTask) {
+                updateTask(editingTask.id, values)
+                addToast({ title: 'Task updated', variant: 'success' })
+            } else {
+                addTask(values)
+                addToast({ title: 'Task created', variant: 'success' })
+            }
+            setModalOpen(false)
+            setEditingTask(null)
+            isDirtyRef.current = false
+        },
+        [editingTask, updateTask, addTask, addToast]
+    )
 
     return (
         <div className="min-h-screen bg-gray-50">
             <header className="border-b border-gray-200 bg-white">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
                     <h1 className="text-xl font-bold text-gray-900">Workflow Board</h1>
-                    <Button size="sm">+ New Task</Button>
+                    <Button size="sm" onClick={openCreate}>
+                        + New Task
+                    </Button>
                 </div>
             </header>
 
@@ -80,7 +134,7 @@ export function BoardPage() {
                                 key={value}
                                 status={value}
                                 tasks={tasksByStatus[value]}
-                                onEditTask={handleEditTask}
+                                onEditTask={openEdit}
                             />
                         ))}
                     </div>
@@ -90,6 +144,34 @@ export function BoardPage() {
                     </DragOverlay>
                 </DndContext>
             </main>
+
+            <Modal open={modalOpen} onOpenChange={handleModalClose}>
+                <Modal.Header>
+                    <Modal.Title>{editingTask ? 'Edit Task' : 'Create Task'}</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <TaskForm
+                        key={editingTask?.id ?? 'new'}
+                        initialValues={
+                            editingTask
+                                ? {
+                                    title: editingTask.title,
+                                    description: editingTask.description,
+                                    status: editingTask.status,
+                                    priority: editingTask.priority,
+                                    assignee: editingTask.assignee,
+                                    tags: editingTask.tags,
+                                }
+                                : undefined
+                        }
+                        onSubmit={handleSubmit}
+                        onCancel={() => handleModalClose(false)}
+                        onDirtyChange={(dirty) => {
+                            isDirtyRef.current = dirty
+                        }}
+                    />
+                </Modal.Body>
+            </Modal>
         </div>
     )
 }
