@@ -1,3 +1,4 @@
+import { CaretDownIcon, CheckIcon } from "@phosphor-icons/react";
 import { forwardRef, useEffect, useId, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 
@@ -92,7 +93,11 @@ const MultiSelect = forwardRef<HTMLButtonElement, MultiSelectProps>(
             )}
           >
             <span className="truncate">{triggerLabel}</span>
-            <ChevronDownIcon open={open} />
+            <CaretDownIcon
+              size={14}
+              weight="bold"
+              className={cn("text-text-muted transition-transform", open && "rotate-180")}
+            />
           </button>
 
           {open && (
@@ -118,13 +123,24 @@ const MultiSelect = forwardRef<HTMLButtonElement, MultiSelectProps>(
                       )}
                       onClick={() => toggleOption(option.value)}
                     >
+                      <span
+                        className={cn(
+                          "flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded border transition-colors",
+                          checked
+                            ? "border-primary-600 bg-primary-600"
+                            : "border-text-muted bg-surface",
+                        )}
+                        aria-hidden="true"
+                      >
+                        {checked && <CheckIcon size={10} weight="bold" className="text-white" />}
+                      </span>
                       <input
                         id={checkboxId}
                         type="checkbox"
                         checked={checked}
                         onChange={() => toggleOption(option.value)}
                         onClick={(e) => e.stopPropagation()}
-                        className="h-3.5 w-3.5 rounded border-border accent-primary-600"
+                        className="sr-only"
                         aria-label={option.label}
                       />
                       <label
@@ -147,27 +163,6 @@ const MultiSelect = forwardRef<HTMLButtonElement, MultiSelectProps>(
 );
 
 MultiSelect.displayName = "MultiSelect";
-
-function ChevronDownIcon({ open }: { open: boolean }) {
-  return (
-    <svg
-      width="16"
-      height="16"
-      viewBox="0 0 16 16"
-      fill="none"
-      className={cn("text-text-muted transition-transform", open && "rotate-180")}
-      aria-hidden="true"
-    >
-      <path
-        d="M4 6l4 4 4-4"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
 
 export type { MultiSelectOption, MultiSelectProps };
 export { MultiSelect };
