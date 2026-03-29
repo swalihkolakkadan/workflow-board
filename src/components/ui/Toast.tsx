@@ -1,3 +1,4 @@
+import { XIcon } from "@phosphor-icons/react";
 import * as ToastPrimitive from "@radix-ui/react-toast";
 import { cva, type VariantProps } from "class-variance-authority";
 import type { ReactNode } from "react";
@@ -64,20 +65,7 @@ function Toast({
         className="rounded p-1 opacity-50 hover:opacity-100 focus:outline-none focus:ring-1 focus:ring-current"
         aria-label="Dismiss"
       >
-        <svg
-          width="14"
-          height="14"
-          viewBox="0 0 14 14"
-          fill="none"
-          aria-hidden="true"
-        >
-          <path
-            d="M3.5 3.5l7 7M10.5 3.5l-7 7"
-            stroke="currentColor"
-            strokeWidth="1.5"
-            strokeLinecap="round"
-          />
-        </svg>
+        <XIcon size={14} weight="bold" />
       </ToastPrimitive.Close>
     </ToastPrimitive.Root>
   );

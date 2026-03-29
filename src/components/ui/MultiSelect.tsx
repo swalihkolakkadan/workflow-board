@@ -93,11 +93,7 @@ const MultiSelect = forwardRef<HTMLButtonElement, MultiSelectProps>(
             )}
           >
             <span className="truncate">{triggerLabel}</span>
-            <CaretDownIcon
-              size={14}
-              weight="bold"
-              className={cn("text-text-muted transition-transform", open && "rotate-180")}
-            />
+            <CaretDownIcon size={14} weight="bold" className="text-text-muted" />
           </button>
 
           {open && (

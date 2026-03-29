@@ -1,3 +1,4 @@
+import { CaretDownIcon } from "@phosphor-icons/react";
 import * as SelectPrimitive from "@radix-ui/react-select";
 import { forwardRef, useId } from "react";
 import { cn } from "@/lib/utils";
@@ -70,7 +71,7 @@ const Select = forwardRef<HTMLButtonElement, SelectProps>(
           >
             <SelectPrimitive.Value placeholder={placeholder} />
             <SelectPrimitive.Icon>
-              <ChevronDownIcon />
+              <CaretDownIcon size={14} weight="bold" className="text-text-muted" />
             </SelectPrimitive.Icon>
           </SelectPrimitive.Trigger>
 
@@ -111,27 +112,6 @@ const Select = forwardRef<HTMLButtonElement, SelectProps>(
 );
 
 Select.displayName = "Select";
-
-function ChevronDownIcon() {
-  return (
-    <svg
-      width="16"
-      height="16"
-      viewBox="0 0 16 16"
-      fill="none"
-      className="text-text-muted"
-      aria-hidden="true"
-    >
-      <path
-        d="M4 6l4 4 4-4"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
 
 export type { SelectOption, SelectProps };
 export { Select };
