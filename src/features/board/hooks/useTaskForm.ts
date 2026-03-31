@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from "react";
+import { useState } from "react";
 import type { TaskFormValues } from "@/lib/types";
 
 type FormErrors = Partial<Record<keyof TaskFormValues, string>>;
@@ -30,41 +30,33 @@ export function useTaskForm(initialValues?: TaskFormValues) {
   const [errors, setErrors] = useState<FormErrors>({});
   const [baseline, setBaseline] = useState<TaskFormValues>(() => defaults);
 
-  const isDirty = useMemo(() => {
-    return JSON.stringify(values) !== JSON.stringify(baseline);
-  }, [values, baseline]);
+  const isDirty = JSON.stringify(values) !== JSON.stringify(baseline);
 
-  const handleChange = useCallback(
-    <K extends keyof TaskFormValues>(field: K, value: TaskFormValues[K]) => {
-      setValues((prev) => ({ ...prev, [field]: value }));
-      setErrors((prev) => {
-        if (!prev[field]) return prev;
-        const next = { ...prev };
-        delete next[field];
-        return next;
-      });
-    },
-    [],
-  );
+  function handleChange<K extends keyof TaskFormValues>(field: K, value: TaskFormValues[K]) {
+    setValues((prev) => ({ ...prev, [field]: value }));
+    setErrors((prev) => {
+      if (!prev[field]) return prev;
+      const next = { ...prev };
+      delete next[field];
+      return next;
+    });
+  }
 
-  const handleSubmit = useCallback(
-    (onSubmit: (values: TaskFormValues) => void) => {
-      const errs = validate(values);
-      if (Object.keys(errs).length > 0) {
-        setErrors(errs);
-        return;
-      }
-      onSubmit(values);
-    },
-    [values],
-  );
+  function handleSubmit(onSubmit: (values: TaskFormValues) => void) {
+    const errs = validate(values);
+    if (Object.keys(errs).length > 0) {
+      setErrors(errs);
+      return;
+    }
+    onSubmit(values);
+  }
 
-  const reset = useCallback((newDefaults?: TaskFormValues) => {
+  function reset(newDefaults?: TaskFormValues) {
     const d = newDefaults ?? INITIAL_VALUES;
     setValues(d);
     setErrors({});
     setBaseline(d);
-  }, []);
+  }
 
   return { values, errors, isDirty, handleChange, handleSubmit, reset };
 }

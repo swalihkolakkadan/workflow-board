@@ -5,7 +5,7 @@ import {
   DragOverlay,
   type DragStartEvent,
 } from "@dnd-kit/core";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Button, Modal } from "@/components/ui";
 import { PRIORITY_WEIGHT, STATUSES } from "@/lib/constants";
 import { isStorageAvailable } from "@/lib/storage";
@@ -47,109 +47,96 @@ export function BoardPage() {
     }
   }, [init, addToast]);
 
-  const filteredTasks = useMemo(() => {
-    let result = tasks;
+  let filteredTasks = tasks;
 
-    if (filters.search) {
-      const q = filters.search.toLowerCase();
-      result = result.filter(
-        (t) =>
-          t.title.toLowerCase().includes(q) ||
-          t.description.toLowerCase().includes(q),
-      );
+  if (filters.search) {
+    const q = filters.search.toLowerCase();
+    filteredTasks = filteredTasks.filter(
+      (t) =>
+        t.title.toLowerCase().includes(q) ||
+        t.description.toLowerCase().includes(q),
+    );
+  }
+
+  if (filters.status.length > 0) {
+    filteredTasks = filteredTasks.filter((t) => filters.status.includes(t.status));
+  }
+
+  if (filters.priority) {
+    filteredTasks = filteredTasks.filter((t) => t.priority === filters.priority);
+  }
+
+  filteredTasks = [...filteredTasks].sort((a, b) => {
+    if (filters.sort === "priority") {
+      return PRIORITY_WEIGHT[b.priority] - PRIORITY_WEIGHT[a.priority];
     }
+    return (
+      new Date(b[filters.sort]).getTime() -
+      new Date(a[filters.sort]).getTime()
+    );
+  });
 
-    if (filters.status.length > 0) {
-      result = result.filter((t) => filters.status.includes(t.status));
-    }
+  const tasksByStatus: Record<Status, Task[]> = {
+    backlog: [],
+    "in-progress": [],
+    done: [],
+  };
+  for (const task of filteredTasks) {
+    tasksByStatus[task.status].push(task);
+  }
 
-    if (filters.priority) {
-      result = result.filter((t) => t.priority === filters.priority);
-    }
+  function handleDragStart(event: DragStartEvent) {
+    const task = tasks.find((t) => t.id === event.active.id);
+    setActiveTask(task ?? null);
+  }
 
-    result = [...result].sort((a, b) => {
-      if (filters.sort === "priority") {
-        return PRIORITY_WEIGHT[b.priority] - PRIORITY_WEIGHT[a.priority];
+  function handleDragEnd(event: DragEndEvent) {
+    setActiveTask(null);
+    const { active, over } = event;
+    if (!over) return;
+
+    const taskId = active.id as string;
+    const overId = over.id as string;
+
+    // over.id is either a column status or a card UUID — resolve to a status
+    const newStatus: Status | undefined = STATUSES.some((s) => s.value === overId)
+      ? (overId as Status)
+      : tasks.find((t) => t.id === overId)?.status;
+
+    if (newStatus) {
+      const task = tasks.find((t) => t.id === taskId);
+      if (task && task.status !== newStatus) {
+        moveTask(taskId, newStatus);
+        addToast({
+          title: `Moved to ${STATUSES.find((s) => s.value === newStatus)?.label}`,
+          variant: "success",
+        });
       }
-      return (
-        new Date(b[filters.sort]).getTime() -
-        new Date(a[filters.sort]).getTime()
-      );
-    });
-
-    return result;
-  }, [tasks, filters]);
-
-  const tasksByStatus = useMemo(() => {
-    const grouped: Record<Status, Task[]> = {
-      backlog: [],
-      "in-progress": [],
-      done: [],
-    };
-    for (const task of filteredTasks) {
-      grouped[task.status].push(task);
     }
-    return grouped;
-  }, [filteredTasks]);
+  }
 
-  const handleDragStart = useCallback(
-    (event: DragStartEvent) => {
-      const task = tasks.find((t) => t.id === event.active.id);
-      setActiveTask(task ?? null);
-    },
-    [tasks],
-  );
-
-  const handleDragEnd = useCallback(
-    (event: DragEndEvent) => {
-      setActiveTask(null);
-      const { active, over } = event;
-      if (!over) return;
-
-      const taskId = active.id as string;
-      const overId = over.id as string;
-
-      // over.id is either a column status or a card UUID — resolve to a status
-      const newStatus: Status | undefined = STATUSES.some((s) => s.value === overId)
-        ? (overId as Status)
-        : tasks.find((t) => t.id === overId)?.status;
-
-      if (newStatus) {
-        const task = tasks.find((t) => t.id === taskId);
-        if (task && task.status !== newStatus) {
-          moveTask(taskId, newStatus);
-          addToast({
-            title: `Moved to ${STATUSES.find((s) => s.value === newStatus)?.label}`,
-            variant: "success",
-          });
-        }
-      }
-    },
-    [tasks, moveTask, addToast],
-  );
-
-  const openCreate = useCallback(() => {
+  function openCreate() {
     setEditingTask(null);
     setModalOpen(true);
-  }, []);
+  }
 
-  const openEdit = useCallback((task: Task) => {
+  function openEdit(task: Task) {
     setEditingTask(task);
     setModalOpen(true);
-  }, []);
+  }
 
-  const handleDelete = useCallback((task: Task) => {
+  function handleDelete(task: Task) {
     setTaskToDelete(task);
-  }, []);
+  }
 
-  const handleConfirmDelete = useCallback(() => {
+  function handleConfirmDelete() {
     if (!taskToDelete) return;
     deleteTask(taskToDelete.id);
     addToast({ title: "Task deleted", variant: "default" });
     setTaskToDelete(null);
-  }, [taskToDelete, deleteTask, addToast]);
+  }
 
-  const handleModalClose = useCallback((open: boolean) => {
+  function handleModalClose(open: boolean) {
     if (!open && isDirtyRef.current) {
       setDiscardOpen(true);
       return;
@@ -159,31 +146,28 @@ export function BoardPage() {
       setEditingTask(null);
       isDirtyRef.current = false;
     }
-  }, []);
+  }
 
-  const handleDiscardConfirm = useCallback(() => {
+  function handleDiscardConfirm() {
     setDiscardOpen(false);
     setModalOpen(false);
     setEditingTask(null);
     isDirtyRef.current = false;
     setIsDirtyState(false);
-  }, []);
+  }
 
-  const handleSubmit = useCallback(
-    (values: TaskFormValues) => {
-      if (editingTask) {
-        updateTask(editingTask.id, values);
-        addToast({ title: "Task updated", variant: "success" });
-      } else {
-        addTask(values);
-        addToast({ title: "Task created", variant: "success" });
-      }
-      setModalOpen(false);
-      setEditingTask(null);
-      isDirtyRef.current = false;
-    },
-    [editingTask, updateTask, addTask, addToast],
-  );
+  function handleSubmit(values: TaskFormValues) {
+    if (editingTask) {
+      updateTask(editingTask.id, values);
+      addToast({ title: "Task updated", variant: "success" });
+    } else {
+      addTask(values);
+      addToast({ title: "Task created", variant: "success" });
+    }
+    setModalOpen(false);
+    setEditingTask(null);
+    isDirtyRef.current = false;
+  }
 
   return (
     <div className="min-h-screen flex flex-col">

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useId, useState } from "react";
+import { useEffect, useId, useState } from "react";
 import { Button, Select, TextArea, TextInput } from "@/components/ui";
 import { PRIORITIES, STATUSES } from "@/lib/constants";
 import type { TaskFormValues } from "@/lib/types";
@@ -26,23 +26,20 @@ export function TaskForm({
     onDirtyChange?.(isDirty);
   }, [isDirty, onDirtyChange]);
 
-  const addTag = useCallback(() => {
+  function addTag() {
     const tag = tagInput.trim();
     if (tag && !values.tags.includes(tag)) {
       handleChange("tags", [...values.tags, tag]);
     }
     setTagInput("");
-  }, [tagInput, values.tags, handleChange]);
+  }
 
-  const removeTag = useCallback(
-    (tag: string) => {
-      handleChange(
-        "tags",
-        values.tags.filter((t) => t !== tag),
-      );
-    },
-    [values.tags, handleChange],
-  );
+  function removeTag(tag: string) {
+    handleChange(
+      "tags",
+      values.tags.filter((t) => t !== tag),
+    );
+  }
 
   return (
     <form

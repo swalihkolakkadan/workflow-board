@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { DEFAULT_FILTERS } from "@/lib/constants";
 import type { FilterState, Priority, SortField, Status } from "@/lib/types";
 
@@ -45,16 +45,13 @@ export function useFilterParams() {
     return () => clearTimeout(debounceRef.current);
   }, [filters]);
 
-  const setFilter = useCallback(
-    <K extends keyof FilterState>(key: K, value: FilterState[K]) => {
-      setFilters((prev) => ({ ...prev, [key]: value }));
-    },
-    [],
-  );
+  function setFilter<K extends keyof FilterState>(key: K, value: FilterState[K]) {
+    setFilters((prev) => ({ ...prev, [key]: value }));
+  }
 
-  const clearFilters = useCallback(() => {
+  function clearFilters() {
     setFilters(DEFAULT_FILTERS);
-  }, []);
+  }
 
   const hasActiveFilters =
     filters.search !== "" ||

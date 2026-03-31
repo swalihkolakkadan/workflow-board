@@ -1,7 +1,6 @@
 import {
   forwardRef,
   type TextareaHTMLAttributes,
-  useCallback,
   useId,
   useRef,
 } from "react";
@@ -31,25 +30,19 @@ const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(
     const errorId = `${id}-error`;
     const internalRef = useRef<HTMLTextAreaElement | null>(null);
 
-    const handleChange = useCallback(
-      (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-        if (autoGrow && internalRef.current) {
-          internalRef.current.style.height = "auto";
-          internalRef.current.style.height = `${internalRef.current.scrollHeight}px`;
-        }
-        onChange?.(e);
-      },
-      [autoGrow, onChange],
-    );
+    function handleChange(e: React.ChangeEvent<HTMLTextAreaElement>) {
+      if (autoGrow && internalRef.current) {
+        internalRef.current.style.height = "auto";
+        internalRef.current.style.height = `${internalRef.current.scrollHeight}px`;
+      }
+      onChange?.(e);
+    }
 
-    const setRefs = useCallback(
-      (node: HTMLTextAreaElement | null) => {
-        internalRef.current = node;
-        if (typeof ref === "function") ref(node);
-        else if (ref) ref.current = node;
-      },
-      [ref],
-    );
+    function setRefs(node: HTMLTextAreaElement | null) {
+      internalRef.current = node;
+      if (typeof ref === "function") ref(node);
+      else if (ref) ref.current = node;
+    }
 
     return (
       <div className="flex flex-col gap-1.5">
