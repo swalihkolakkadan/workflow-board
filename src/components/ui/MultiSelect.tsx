@@ -1,5 +1,6 @@
 import { CaretDownIcon, CheckIcon } from "@phosphor-icons/react";
-import { forwardRef, useEffect, useId, useRef, useState } from "react";
+import * as Popover from "@radix-ui/react-popover";
+import { forwardRef, useId } from "react";
 import { cn } from "@/lib/utils";
 
 type MultiSelectOption = {
@@ -30,27 +31,7 @@ const MultiSelect = forwardRef<HTMLButtonElement, MultiSelectProps>(
     },
     ref,
   ) => {
-    const [open, setOpen] = useState(false);
-    const containerRef = useRef<HTMLDivElement>(null);
     const id = useId();
-
-    useEffect(() => {
-      if (!open) return;
-      function handleClickOutside(e: MouseEvent) {
-        if (
-          containerRef.current &&
-          !containerRef.current.contains(e.target as Node)
-        ) {
-          setOpen(false);
-        }
-      }
-      document.addEventListener("mousedown", handleClickOutside);
-      return () => document.removeEventListener("mousedown", handleClickOutside);
-    }, [open]);
-
-    function handleKeyDown(e: React.KeyboardEvent) {
-      if (e.key === "Escape") setOpen(false);
-    }
 
     function toggleOption(optionValue: string) {
       if (value.includes(optionValue)) {
@@ -68,56 +49,69 @@ const MultiSelect = forwardRef<HTMLButtonElement, MultiSelectProps>(
           : `${value.length} selected`;
 
     return (
-      <div className="flex flex-col gap-1.5" ref={containerRef}>
+      <div className="flex flex-col gap-1.5">
         {label && (
           <label htmlFor={id} className="text-sm font-medium text-text-primary">
             {label}
           </label>
         )}
-        <div className="relative">
-          <button
-            ref={ref}
-            id={id}
-            type="button"
-            aria-haspopup="listbox"
-            aria-expanded={open}
-            disabled={disabled}
-            onClick={() => setOpen((o) => !o)}
-            onKeyDown={handleKeyDown}
-            className={cn(
-              "flex h-9 w-full items-center justify-between rounded-xl border border-border bg-surface px-3 text-sm transition-all",
-              "focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500",
-              "disabled:cursor-not-allowed disabled:opacity-50",
-              value.length > 0 ? "text-text-primary" : "text-text-muted",
-              className,
-            )}
-          >
-            <span className="truncate">{triggerLabel}</span>
-            <CaretDownIcon size={14} weight="bold" className="text-text-muted" />
-          </button>
-
-          {open && (
-            <ul
-              role="listbox"
-              aria-multiselectable="true"
-              aria-label={label ?? placeholder}
-              onKeyDown={handleKeyDown}
-              className="absolute z-50 mt-1 w-full overflow-hidden rounded-xl border border-border bg-surface shadow-lg animate-in fade-in-0 zoom-in-95"
+        <Popover.Root>
+          <Popover.Trigger asChild>
+            <button
+              ref={ref}
+              id={id}
+              type="button"
+              disabled={disabled}
+              className={cn(
+                "flex h-9 w-full items-center justify-between rounded-xl border border-border bg-surface px-3 text-sm transition-all",
+                "focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500",
+                "disabled:cursor-not-allowed disabled:opacity-50",
+                value.length > 0 ? "text-text-primary" : "text-text-muted",
+                className,
+              )}
             >
-              <div className="p-1">
+              <span className="truncate">{triggerLabel}</span>
+              <CaretDownIcon
+                size={14}
+                weight="bold"
+                className="text-text-muted"
+              />
+            </button>
+          </Popover.Trigger>
+
+          <Popover.Portal>
+            <Popover.Content
+              sideOffset={4}
+              align="start"
+              className={cn(
+                "z-50 w-(--radix-popover-trigger-width) overflow-hidden rounded-xl border border-border bg-surface shadow-lg",
+                "data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95",
+                "data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95",
+              )}
+              onOpenAutoFocus={(e) => e.preventDefault()}
+            >
+              <div className="p-1" role="listbox" aria-multiselectable="true" aria-label={label ?? placeholder}>
                 {options.map((option) => {
                   const checked = value.includes(option.value);
-                  const checkboxId = `${id}-${option.value}`;
+                  const optionId = `${id}-${option.value}`;
                   return (
-                    <li
+                    <div
                       key={option.value}
                       role="option"
                       aria-selected={checked}
+                      tabIndex={0}
                       className={cn(
-                        "flex cursor-pointer select-none items-center gap-2 rounded-lg px-3 py-1.5 text-sm text-text-primary",
+                        "flex cursor-pointer select-none items-center gap-2 rounded-lg px-3 py-1.5 text-sm text-text-primary outline-none",
                         "hover:bg-primary-50 hover:text-primary-700",
+                        "focus-visible:bg-primary-50 focus-visible:text-primary-700",
                       )}
                       onClick={() => toggleOption(option.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                          e.preventDefault();
+                          toggleOption(option.value);
+                        }
+                      }}
                     >
                       <span
                         className={cn(
@@ -128,31 +122,30 @@ const MultiSelect = forwardRef<HTMLButtonElement, MultiSelectProps>(
                         )}
                         aria-hidden="true"
                       >
-                        {checked && <CheckIcon size={10} weight="bold" className="text-white" />}
+                        {checked && (
+                          <CheckIcon
+                            size={10}
+                            weight="bold"
+                            className="text-white"
+                          />
+                        )}
                       </span>
                       <input
-                        id={checkboxId}
+                        id={optionId}
                         type="checkbox"
                         checked={checked}
                         onChange={() => toggleOption(option.value)}
-                        onClick={(e) => e.stopPropagation()}
                         className="sr-only"
-                        aria-label={option.label}
+                        tabIndex={-1}
                       />
-                      <label
-                        htmlFor={checkboxId}
-                        className="cursor-pointer"
-                        onClick={(e) => e.preventDefault()}
-                      >
-                        {option.label}
-                      </label>
-                    </li>
+                      <span>{option.label}</span>
+                    </div>
                   );
                 })}
               </div>
-            </ul>
-          )}
-        </div>
+            </Popover.Content>
+          </Popover.Portal>
+        </Popover.Root>
       </div>
     );
   },
