@@ -82,7 +82,9 @@ export function BoardPage() {
     done: [],
   };
   for (const task of filteredTasks) {
-    tasksByStatus[task.status].push(task);
+    if (tasksByStatus[task.status]) {
+      tasksByStatus[task.status].push(task);
+    }
   }
 
   function handleDragStart(event: DragStartEvent) {
@@ -242,7 +244,7 @@ export function BoardPage() {
           </div>
 
           <DragOverlay>
-            {activeTask && <TaskCard task={activeTask} onEdit={() => {}} onDelete={() => {}} />}
+            {activeTask && <TaskCard task={activeTask} onEdit={() => { }} onDelete={() => { }} />}
           </DragOverlay>
         </DndContext>
       </main>
@@ -291,13 +293,13 @@ export function BoardPage() {
             initialValues={
               editingTask
                 ? {
-                    title: editingTask.title,
-                    description: editingTask.description,
-                    status: editingTask.status,
-                    priority: editingTask.priority,
-                    assignee: editingTask.assignee,
-                    tags: editingTask.tags,
-                  }
+                  title: editingTask.title,
+                  description: editingTask.description,
+                  status: editingTask.status,
+                  priority: editingTask.priority,
+                  assignee: editingTask.assignee,
+                  tags: editingTask.tags,
+                }
                 : undefined
             }
             onSubmit={handleSubmit}
